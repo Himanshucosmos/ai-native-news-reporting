@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'GEMINI_API_KEY is not configured.' }, { status: 500 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const contextPrefix = directive 
       ? `The human Publisher has issued a specific Editorial Directive for your ongoing coverage: investigate and report on "${trend}".` 
