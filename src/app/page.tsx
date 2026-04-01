@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const revalidate = 1800; // Next.js Global Cache: Fully rebuild every 30 minutes!
+export const maxDuration = 60; // Allow enough time for AI aggregation on Vercel
 
 interface Brief {
   id: string;
@@ -29,7 +30,7 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
     const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`, { next: { revalidate: 1800 } });
     const data = await res.json();
     
-    const items = data.items?.slice(0, 5) || [];
+    const items = data.items?.slice(0, 4) || [];
     if (items.length === 0) return [];
 
     // 2. Synthesize using Gemini 1.5 Flash (Super fast for bulk text processing)
@@ -37,13 +38,15 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    const rawDigests = items.map((item: any, i: number) => `
-STORY ${i+1}: 
+    // Strip HTML and only send concise descriptions, NOT massive full contents, to guarantee <5s generation times
+    const rawDigests = items.map((item: any, i: number) => {
+      const cleanDesc = (item.description || '').replace(/<[^>]*>?/gm, '').substring(0, 300);
+      return `STORY ${i+1}: 
 Title: ${item.title}
 Source: ${data.feed.title || feedType}
-Content Snippet: ${item.description || item.content}
-URL: ${item.link}
-    `).join('\n\n');
+Content Snippet: ${cleanDesc}
+URL: ${item.link}`;
+    }).join('\n\n');
 
     const prompt = `You are the Editor in Chief of 'The Chronicle', an autonomous news aggregator. 
 I am providing you with 5 raw stories pulled from global feeds. 
