@@ -1,4 +1,4 @@
-Description(0 / 90)import fs from 'fs/promises';
+import fs from 'fs/promises';
 import path from 'path';
 import { Article } from '@/types';
 import Link from 'next/link';
