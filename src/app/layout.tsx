@@ -1,39 +1,22 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import ThemeToggle from '@/components/ThemeToggle';
-import fs from 'fs/promises';
-import path from 'path';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' });
 
 export const metadata: Metadata = {
-  title: 'THE CHRONICLE | AI-Native News',
-  description: 'World-class journalism, generated autonomously.',
+  title: 'THE CHRONICLE | Autonomous AI Aggregator',
+  description: 'World-class journalism, aggregated autonomously every 30 minutes.',
 };
 
-async function getCategories(): Promise<string[]> {
-  try {
-    const dataPath = path.join(process.cwd(), 'src/data/news.json');
-    const content = await fs.readFile(dataPath, 'utf-8');
-    const articles = JSON.parse(content);
-    const cats = new Set<string>();
-    articles.forEach((a: any) => {
-       if (a.category && typeof a.category === 'string') cats.add(a.category.toUpperCase());
-    });
-    return Array.from(cats).slice(0, 7); // Max 7 categories in nav
-  } catch(e) {
-    return ['GEOPOLITICS', 'TECHNOLOGY', 'CULTURE', 'ECONOMICS', 'SOCIETY'];
-  }
-}
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const uniqueCategories = await getCategories();
+  const categories = ['MARKETS', 'TECHNOLOGY', 'GLOBAL', 'STARTUPS', 'SCIENCE'];
 
   return (
     <html lang="en">
@@ -56,9 +39,9 @@ export default async function RootLayout({
               })}
             </div>
             <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', display: 'flex', justifyContent: 'center', gap: '2rem', fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-               <a href="/">Home</a>
-               {uniqueCategories.map(cat => (
-                 <a key={cat} href={`/?category=${encodeURIComponent(cat.toLowerCase())}`}>{cat}</a>
+               <a href="/">Latest Digest</a>
+               {categories.map(cat => (
+                 <a key={cat} href={`/?feed=${encodeURIComponent(cat.toLowerCase())}`}>{cat}</a>
                ))}
             </div>
           </div>
