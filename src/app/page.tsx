@@ -30,55 +30,44 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
     const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`, { next: { revalidate: 1800 } });
     const data = await res.json();
     
-    const items = data.items?.slice(0, 4) || [];
+    const items = data.items?.slice(0, 8) || [];
     if (items.length === 0) return [];
 
-    // 2. Synthesize using Gemini 1.5 Flash (Super fast for bulk text processing)
-    if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    // 2. Algorithmic Extraction Engine (Bypassing Gemini explicitly to prevent 429 Quota Limits)
+    // We autonomously compute sentiment, read time, and curate formatting natively.
+    return items.map((item: any, idx: number) => {
+      let cleanDesc = (item.description || '').replace(/<[^>]*>?/gm, '').trim();
+      if (cleanDesc.length > 250) {
+        cleanDesc = cleanDesc.substring(0, 250) + '...';
+      }
 
-    // Strip HTML and only send concise descriptions, NOT massive full contents, to guarantee <5s generation times
-    const rawDigests = items.map((item: any, i: number) => {
-      const cleanDesc = (item.description || '').replace(/<[^>]*>?/gm, '').substring(0, 300);
-      return `STORY ${i+1}: 
-Title: ${item.title}
-Source: ${data.feed.title || feedType}
-Content Snippet: ${cleanDesc}
-URL: ${item.link}`;
-    }).join('\n\n');
+      // Autonomous Algorithmic Sentiment Analysis
+      const positiveWords = ['jump', 'launch', 'growth', 'profit', 'success', 'breakthrough', 'funding', 'new', 'climb', 'gain'];
+      const negativeWords = ['crash', 'drop', 'fall', 'lawsuit', 'fail', 'scandal', 'loss', 'delay', 'down', 'cut'];
+      let sentiment = 'NEUTRAL';
+      let score = 0;
+      const textToAnalyze = (item.title + ' ' + cleanDesc).toLowerCase();
+      for(let w of positiveWords) if(textToAnalyze.includes(w)) score++;
+      for(let w of negativeWords) if(textToAnalyze.includes(w)) score--;
+      if(score > 0) sentiment = 'BULLISH';
+      if(score < 0) sentiment = 'BEARISH';
 
-    const prompt = `You are the Editor in Chief of 'The Chronicle', an autonomous news aggregator. 
-I am providing you with 5 raw stories pulled from global feeds. 
-For each story, synthesize the raw text into a profound, sophisticated 'news brief' summarizing what happened and why it matters globally.
+      const readTime = Math.max(1, Math.floor((item.description || '').split(' ').length / 200));
 
-Format strictly as a RAW JSON ARRAY of objects, like this (no markdown blocks like \`\`\`json):
-[
-  {
-    "aiHeadline": "A sophisticated, editorial headline",
-    "aiSummary": "A 2 paragraph insightful synthesis of the story. Use HTML <p> tags for structure.",
-    "aiCategory": "One word upper case tag (e.g. ECONOMICS)",
-    "readTime": 2
-  }
-]
-
-Raw Stories:
-${rawDigests}`;
-
-    const result = await model.generateContent(prompt);
-    let text = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-    const aiData = JSON.parse(text);
-
-    return aiData.map((aiObj: any, idx: number) => ({
-      ...aiObj,
-      id: `story-${idx}-${Date.now()}`,
-      source: data.feed.title || feedType.toUpperCase(),
-      originalTitle: items[idx].title,
-      link: items[idx].link
-    }));
+      return {
+        id: `story-${idx}-${Date.now()}`,
+        source: data.feed.title || feedType.toUpperCase(),
+        originalTitle: item.title,
+        aiHeadline: item.title,
+        aiSummary: `<p>${cleanDesc}</p>`,
+        aiCategory: sentiment, // Overriding category with dynamic Algorithmic Sentiment
+        link: item.link,
+        readTime: readTime
+      };
+    });
 
   } catch (error) {
-    console.error("Aggregation Failed:", error);
+    console.error("Algorithmic Aggregation Failed:", error);
     return [];
   }
 }
@@ -120,7 +109,13 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
             <article key={brief.id} className="animate-fade-up" style={{ animationDelay: ((index % 3) * 100) + 'ms', paddingBottom: '3rem', borderBottom: '1px solid var(--border-color)' }}>
               
               <div className="story-meta" style={{ marginBottom: '1rem' }}>
-                <span style={{ color: 'var(--accent-color)', fontWeight: 600 }}>{brief.aiCategory}</span>
+                <span style={{ 
+                  color: brief.aiCategory === 'BULLISH' ? '#10B981' : brief.aiCategory === 'BEARISH' ? '#EF4444' : 'var(--text-secondary)',
+                  fontWeight: 800,
+                  letterSpacing: '0.1em'
+                }}>
+                  [{brief.aiCategory}]
+                </span>
                 <span className="story-meta-divider"></span>
                 <span>{brief.readTime} MIN READ</span>
                 <span className="story-meta-divider"></span>
