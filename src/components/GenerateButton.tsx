@@ -98,8 +98,6 @@ export default function GenerateButton() {
       {error && (
         <div style={{ color: 'var(--accent-color)', fontSize: '0.875rem', textAlign: 'center', marginTop: '0.5rem' }}>
           <strong>Error:</strong> {error}
-          <br/>
-          <span style={{color: 'var(--text-secondary)'}}>(Check your Gemini API Key in .env.local)</span>
         </div>
       )}
     </div>

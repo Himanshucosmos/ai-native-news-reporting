@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+Description(0 / 90)import fs from 'fs/promises';
 import path from 'path';
 import { Article } from '@/types';
 import Link from 'next/link';
@@ -19,7 +19,7 @@ async function getNews(): Promise<Article[]> {
 
 export default async function Home(props: { searchParams?: Promise<{ category?: string }> }) {
   let articles = await getNews();
-  
+
   let filterCat = '';
   if (props.searchParams) {
     const resolvedParams = await props.searchParams;
@@ -38,14 +38,14 @@ export default async function Home(props: { searchParams?: Promise<{ category?: 
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 className="font-serif" style={{ fontSize: '3rem', marginBottom: '1rem' }}>The Future of Global Reporting</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.25rem', maxWidth: '600px', margin: '0 auto' }}>
-            Welcome to the world's first AI-native news surface. Our autonomous digital pipeline monitors global trends, verifies facts, and synthesizes profound 
+            Welcome to the world's first AI-native news surface. Our autonomous digital pipeline monitors global trends, verifies facts, and synthesizes profound
             long-form journalism—all with zero human editorial intervention.
           </p>
         </div>
 
         <div style={{
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: '3rem',
           padding: '3rem',
           background: 'rgba(0,0,0,0.02)',
@@ -75,9 +75,9 @@ export default async function Home(props: { searchParams?: Promise<{ category?: 
   return (
     <div className="container">
       {/* Editor's Desk / Pipeline Status Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         paddingBottom: '1.5rem',
         borderBottom: '2px solid var(--text-color)',
@@ -85,7 +85,7 @@ export default async function Home(props: { searchParams?: Promise<{ category?: 
       }}>
         <h3 className="font-serif" style={{ margin: 0 }}>Latest Dispatches</h3>
         <div>
-           <GenerateButton />
+          <GenerateButton />
         </div>
       </div>
 
@@ -97,10 +97,10 @@ export default async function Home(props: { searchParams?: Promise<{ category?: 
               <Link href={`/article/${heroStory.slug}`} className="story-card">
                 <div className="image-wrapper">
                   {/* Since image generation takes time, simulate high end aesthetic with grayscale placeholders */}
-                  <img 
-                    src={heroStory.imageUrl} 
-                    alt={heroStory.title} 
-                    className="story-card-image" 
+                  <img
+                    src={heroStory.imageUrl}
+                    alt={heroStory.title}
+                    className="story-card-image"
                   />
                 </div>
                 <div className="story-meta" style={{ marginTop: '1rem' }}>
@@ -122,17 +122,17 @@ export default async function Home(props: { searchParams?: Promise<{ category?: 
 
           {otherStories.length > 0 && (
             <div className="animate-fade-up delay-100" style={{
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '2rem'
             }}>
               {otherStories.slice(0, 4).map((story) => (
                 <Link href={`/article/${story.slug}`} key={story.id} className="story-card">
-                  <div className="image-wrapper" style={{aspectRatio: '16/9'}}>
-                    <img 
-                      src={story.imageUrl} 
-                      alt={story.title} 
-                      className="story-card-image" 
+                  <div className="image-wrapper" style={{ aspectRatio: '16/9' }}>
+                    <img
+                      src={story.imageUrl}
+                      alt={story.title}
+                      className="story-card-image"
                     />
                   </div>
                   <div className="story-meta" style={{ marginTop: '0.75rem' }}>
@@ -149,32 +149,32 @@ export default async function Home(props: { searchParams?: Promise<{ category?: 
 
         {/* Side Widget Column */}
         <div className="animate-fade-up delay-200" style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-          
+
           <div style={{ padding: '2rem', background: 'var(--text-color)', color: 'var(--bg-color)' }}>
-              <h4 className="font-serif" style={{ fontSize: '1.25rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '0.5rem' }}>About The Chronicle</h4>
-              <p style={{ opacity: 0.8, fontSize: '0.875rem', lineHeight: '1.8' }}>
-                A paradigm shift in journalism. This surface curates, drafts, and immortalizes global context entirely autonomously. Not a newsletter—a full-scale algorithmic publication.
-              </p>
+            <h4 className="font-serif" style={{ fontSize: '1.25rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '0.5rem' }}>About The Chronicle</h4>
+            <p style={{ opacity: 0.8, fontSize: '0.875rem', lineHeight: '1.8' }}>
+              A paradigm shift in journalism. This surface curates, drafts, and immortalizes global context entirely autonomously. Not a newsletter—a full-scale algorithmic publication.
+            </p>
           </div>
 
           <div>
-             <h4 className="font-serif" style={{ fontSize: '1.25rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Trending Topics</h4>
-             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {['#GlobalEconomics', '#FutureOfAI', '#SpaceRace2026', '#ClimatePolicy', '#DigitalSovereignty'].map((topic, i) => (
-                  <li key={i} style={{ 
-                    color: 'var(--text-color)', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: 600
-                  }}>
-                    <span style={{ color: 'var(--accent-color)' }}>{i+1}.</span> {topic}
-                  </li>
-                ))}
-             </ul>
+            <h4 className="font-serif" style={{ fontSize: '1.25rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Trending Topics</h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {['#GlobalEconomics', '#FutureOfAI', '#SpaceRace2026', '#ClimatePolicy', '#DigitalSovereignty'].map((topic, i) => (
+                <li key={i} style={{
+                  color: 'var(--text-color)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 600
+                }}>
+                  <span style={{ color: 'var(--accent-color)' }}>{i + 1}.</span> {topic}
+                </li>
+              ))}
+            </ul>
           </div>
-          
+
         </div>
 
       </div>
