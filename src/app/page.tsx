@@ -36,7 +36,7 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
     // 2. Synthesize using Gemini 1.5 Flash (Super fast for bulk text processing)
     if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Strip HTML and only send concise descriptions, NOT massive full contents, to guarantee <5s generation times
     const rawDigests = items.map((item: any, i: number) => {
