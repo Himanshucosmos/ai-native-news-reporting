@@ -105,15 +105,8 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
     <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
       
       {/* Editor's Desk / Pipeline Status Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'baseline',
-        paddingBottom: '1.5rem',
-        borderBottom: '2px solid var(--text-color)',
-        marginBottom: '3rem'
-      }}>
-        <h3 className="font-serif" style={{ margin: 0, fontSize: '1.5rem' }}>
+      <div className="top-header">
+        <h3 className="font-serif" style={{ margin: 0 }}>
           {isHomepage ? 'LATEST HEADLINES' : feedParam.toUpperCase()}
         </h3>
         <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'monospace' }}>
@@ -127,7 +120,7 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
           <p style={{ color: 'var(--text-secondary)' }}>The pipeline is currently parsing global APIs. Establishing connection vectors...</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '8fr 4fr', gap: '4rem', alignItems: 'start' }}>
+        <div className="dashboard-layout">
           
           {/* LEFT: Feed Stream */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
@@ -163,7 +156,7 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
                 </div>
 
                 {/* Main Headline */}
-                <h2 className="font-serif" style={{ fontSize: '2.5rem', lineHeight: 1.25, marginBottom: '1.5rem', letterSpacing: '-0.02em' }}>
+                <h2 className="article-headline">
                   {brief.aiHeadline}
                 </h2>
 
@@ -174,7 +167,15 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
                 />
 
                 {/* Footer Action */}
-                <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ 
+                  marginTop: '2.5rem', 
+                  display: 'flex', 
+                  flexDirection: 'row',
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '1rem'
+                }}>
                   <span style={{ fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6 }}>
                     {brief.readTime} MIN READ VIA {brief.source}
                   </span>
@@ -182,18 +183,7 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
                     href={brief.link} 
                     target="_blank" 
                     rel="noreferrer"
-                    style={{ 
-                      display: 'inline-block',
-                      padding: '0.75rem 1.5rem',
-                      background: 'var(--text-color)',
-                      color: 'var(--bg-color)',
-                      fontSize: '0.875rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      fontWeight: 700,
-                      textDecoration: 'none',
-                      transition: 'opacity 0.2s ease'
-                    }}
+                    className="primary-button"
                   >
                     ACCESS PRIMARY SOURCE
                   </a>
@@ -204,59 +194,51 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
           </div>
 
           {/* RIGHT: Global Pulse Dashboard */}
-          <div className="animate-fade-up" style={{ 
-            position: 'sticky', 
-            top: '2rem', 
-            padding: '2rem', 
-            background: 'var(--text-color)', 
-            color: 'var(--bg-color)',
-            borderRadius: '8px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
-          }}>
-            <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '2rem', opacity: 0.6, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="animate-fade-up pulse-board">
+            <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem', opacity: 0.8, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', animation: 'pulse 2s infinite' }}></span>
-              Global Pulse Dashboard
+              ALGORITHMIC INDEX
             </h4>
             
             <div style={{ marginBottom: '2.5rem' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: 300, lineHeight: 1 }}>{totalAnalyzed}</div>
-              <div style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.7, marginTop: '0.5rem' }}>Entities Analyzed</div>
+              <div className="pulse-board-value" style={{ fontWeight: 400, fontFamily: 'var(--font-serif)', lineHeight: 1 }}>{totalAnalyzed}</div>
+              <div style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.6, marginTop: '0.3rem' }}>Stories Parsed</div>
             </div>
 
-            <div style={{ marginBottom: '2.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 600 }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 700 }}>
                 <span>BULLISH</span>
                 <span>{bullPct}%</span>
               </div>
-              <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden' }}>
                 <div style={{ width: `${bullPct}%`, height: '100%', background: '#10B981', transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }}></div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '2.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 600 }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 700 }}>
                 <span>BEARISH</span>
                 <span>{bearPct}%</span>
               </div>
-              <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden' }}>
                 <div style={{ width: `${bearPct}%`, height: '100%', background: '#EF4444', transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }}></div>
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 600 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 700 }}>
                 <span>NEUTRAL</span>
                 <span>{neutralPct}%</span>
               </div>
-              <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                <div style={{ width: `${neutralPct}%`, height: '100%', background: 'var(--bg-color)', opacity: 0.5, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }}></div>
+              <div style={{ width: '100%', height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${neutralPct}%`, height: '100%', background: 'var(--text-secondary)', transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }}></div>
               </div>
             </div>
 
-            <div style={{ paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-              <div className="animate-fade-up delay-200" style={{ fontSize: '0.75rem', fontFamily: 'monospace', opacity: 0.5, lineHeight: 1.6 }}>
-                &gt; ALGORITHMIC ENGINE LIVE<br/>
-                &gt; INDEXING RAW MARKET FEEDS<br/>
+            <div style={{ paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
+              <div className="animate-fade-up delay-200" style={{ fontSize: '0.7rem', fontFamily: 'monospace', opacity: 0.5, lineHeight: 1.6 }}>
+                &gt; LIVE NODE: ACTIVE<br/>
+                &gt; SENTIMENT THRESHOLD: 0.5<br/>
                 &gt; CACHE INTEGRITY... OK
               </div>
             </div>
