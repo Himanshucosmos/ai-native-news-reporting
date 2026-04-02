@@ -1,0 +1,19 @@
+
+> temp_build@0.1.0 dev
+> next dev
+
+⚠ Port 3000 is in use by process 82736, using available port 3001 instead.
+▲ Next.js 16.2.2 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.31.74:3001
+- Environments: .env.local
+✓ Ready in 743ms
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          82736
+- Dir:          /Users/ryan/Desktop/AI-native news tool
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 82736 to stop it.
+[?25h

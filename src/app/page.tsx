@@ -194,8 +194,6 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
                       textDecoration: 'none',
                       transition: 'opacity 0.2s ease'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
-                    onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
                   >
                     ACCESS PRIMARY SOURCE
                   </a>
