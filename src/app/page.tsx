@@ -26,14 +26,37 @@ const FEEDS: Record<string, string> = {
 
 async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
   try {
-    const rssUrl = FEEDS[feedType.toLowerCase()] || FEEDS['technology'];
-    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`, { next: { revalidate: 1800 } });
-    const data = await res.json();
-    
-    const items = data.items?.slice(0, 8) || [];
-    if (items.length === 0) return [];
+    let rawItems: any[] = [];
 
-    return items.map((item: any, idx: number) => {
+    if (feedType === 'latest' || !FEEDS[feedType.toLowerCase()]) {
+      // 1. DIVERSIFIED HOMEPAGE AGGREGATION: Pull 2 top articles from ALL major market pipelines concurrently
+      const feedKeys = ['markets', 'global', 'technology', 'startups'];
+      const fetches = feedKeys.map(k => fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEEDS[k])}`, { next: { revalidate: 1800 } }).then(r => r.json()));
+      const results = await Promise.all(fetches);
+      
+      results.forEach((data, index) => {
+        const feedItems = data.items?.slice(0, 2) || [];
+        feedItems.forEach((i: any) => {
+          i._overrideSource = feedKeys[index] === 'global' ? 'BBC WORLD' : feedKeys[index] === 'startups' ? 'Y-COMBINATOR' : data.feed?.title || feedKeys[index].toUpperCase();
+          rawItems.push(i);
+        });
+      });
+      
+      // Chronological sort or algorithmic pseudo-shuffle for the feed
+      rawItems = rawItems.sort(() => Math.random() - 0.5);
+
+    } else {
+      // 1B. Single target feed fetch (e.g. user clicked "MARKETS" specifically)
+      const rssUrl = FEEDS[feedType.toLowerCase()];
+      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`, { next: { revalidate: 1800 } });
+      const data = await res.json();
+      rawItems = data.items?.slice(0, 8) || [];
+      rawItems.forEach((i: any) => i._overrideSource = data.feed?.title || feedType.toUpperCase());
+    }
+    
+    if (rawItems.length === 0) return [];
+
+    return rawItems.map((item: any, idx: number) => {
       let cleanDesc = (item.description || '').replace(/<[^>]*>?/gm, '').trim();
       if (cleanDesc.length > 250) {
         cleanDesc = cleanDesc.substring(0, 250) + '...';
@@ -58,7 +81,7 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
 
       return {
         id: `story-${idx}-${Date.now()}`,
-        source: data.feed.title || feedType.toUpperCase(),
+        source: item._overrideSource,
         originalTitle: item.title,
         aiHeadline: item.title,
         aiSummary: `<p>${cleanDesc}</p>`,
@@ -77,7 +100,7 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
 }
 
 export default async function AggregatorPage({ searchParams }: { searchParams?: Promise<{ feed?: string }> }) {
-  let feedParam = 'technology';
+  let feedParam = 'latest';
   let isHomepage = true;
   if (searchParams) {
     const resolvedParams = await searchParams;
