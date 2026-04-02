@@ -74,9 +74,13 @@ async function fetchAndSummarize(feedType: string): Promise<Brief[]> {
 
 export default async function AggregatorPage({ searchParams }: { searchParams?: Promise<{ feed?: string }> }) {
   let feedParam = 'technology';
+  let isHomepage = true;
   if (searchParams) {
     const resolvedParams = await searchParams;
-    feedParam = resolvedParams.feed || 'technology';
+    if (resolvedParams.feed) {
+      feedParam = resolvedParams.feed;
+      isHomepage = false;
+    }
   }
 
   const briefs = await fetchAndSummarize(feedParam);
@@ -92,7 +96,7 @@ export default async function AggregatorPage({ searchParams }: { searchParams?: 
         borderBottom: '2px solid var(--text-color)',
         marginBottom: '2rem'
       }}>
-        <h3 className="font-serif" style={{ margin: 0 }}>The Automated Digest: {feedParam.toUpperCase()}</h3>
+        <h3 className="font-serif" style={{ margin: 0 }}>The Automated Digest: {isHomepage ? 'LATEST HEADLINES' : feedParam.toUpperCase()}</h3>
         <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Updated Every 30 Minutes
         </div>
